@@ -1,0 +1,53 @@
+package com.example.user.testing;
+
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.CheckBox;
+
+public class MainActivity extends AppCompatActivity {
+    CheckBox dontShowAgain;
+    public static final String PREFS_NAME = "MyPrefsFile1";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        final AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
+        LayoutInflater adbInflater = LayoutInflater.from(MainActivity.this);
+        View eulaLayout = adbInflater.inflate(R.layout.checkbox, null);
+
+        dontShowAgain = (CheckBox) eulaLayout.findViewById(R.id.skip);
+        adb.setView(eulaLayout);
+        adb.setTitle("Attention");
+        adb.setMessage("Your message here");
+        adb.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+
+
+                SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putBoolean("skipMessage", dontShowAgain.isChecked());
+                editor.commit();
+                dialog.cancel();
+            }
+        });
+
+        adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        Boolean skipMessage = settings.getBoolean("skipMessage", false);
+        if (skipMessage.equals(false)) {
+            adb.show();
+        }
+
+    }
+
+}
